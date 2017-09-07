@@ -11,7 +11,7 @@ import org.junit.Test;
  * @author sachin.srivastava
  *
  */
-public class ParkingWelcomeTest {
+public class ParkingLotTest {
 
 	private Welcome wel = new Welcome();
 	@Test
