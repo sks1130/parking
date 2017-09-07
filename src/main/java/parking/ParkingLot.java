@@ -17,7 +17,7 @@ public class ParkingLot {
 
 	static Slots[] slots; // total slots available
 	static int size; // number of cars in the parking
-	static PriorityQueue<Integer> slotQueue = new PriorityQueue();// min heap
+	static PriorityQueue<Integer> slotQueue = new PriorityQueue<>();// min heap
 	// --head
 	// would
 	// give
@@ -26,14 +26,10 @@ public class ParkingLot {
 	// entry
 
 	public static void main(String[] args) {
-		Welcome welcome = new Welcome();
-		System.out.println(welcome.doWelcome());
 		Scanner scan = new Scanner(System.in);
 		String nextLine = scan.nextLine();
 		accept(nextLine, scan);
 		scan.close();
-		/// add method to pass the parameter
-
 	}
 
 	private static void accept(String input, Scanner scan) {
@@ -42,7 +38,7 @@ public class ParkingLot {
 			String commandInput = scan.nextLine();
 			System.out.println();
 			System.out.println("Output:");
-			System.out.println("comman output");// write the output -TODO
+			System.out.println(inputCommand(commandInput));// write the output -TODO
 			while (!commandInput.isEmpty()) {
 				System.out.println();
 				System.out.println("Input:");
@@ -55,7 +51,7 @@ public class ParkingLot {
 				}
 				System.out.println();
 				System.out.println("Output:");
-				System.out.println("comman output");// write the output-- TODO
+				System.out.println(inputCommand(commandInput));// write the output-- TODO
 			}
 
 		}
@@ -153,9 +149,12 @@ public class ParkingLot {
 		return Messages.Leave.getValue() + slot + Messages.Free.getValue();
 	}
 	private static void showStatus(){
-		System.out.println(Messages.SlotNumber.getValue() + "  " + Messages.RegistrationNumber.getValue() + "  " + Messages.Colour.getValue() );
-		for(int i =1 ; i<=slots.length ;i++){
-			System.out.print(i + "  " + slots[i].getCars().getRegistrationNumber() + "  " + slots[i].getCars().getColor());
+		System.out.println(Messages.SlotNumber.getValue() + "\t" + Messages.RegistrationNumber.getValue() + "\t" + Messages.Colour.getValue() );
+		for(int i =1 ; i< slots.length ;i++){
+			if(slots[i].getCars()!=null){
+				System.out.print(i + "\t" + slots[i].getCars().getRegistrationNumber() + "\t" + slots[i].getCars().getColor());
+				System.out.println();
+			}
 		}
 	}
 
@@ -182,13 +181,15 @@ public class ParkingLot {
 		StringBuilder sb = new StringBuilder();
 		int i = 1;
 		for (Slots s : slots) {
-			if (s.getCars().getColor().equals(color)) {
-				sb.append(color);
+			if(s!=null && s.getCars()!=null){
+				if (s.getCars().getColor().equals(color)) {
+					if (i > 1 && i < slots.length) {
+						sb.append(", ");
+					}
+					sb.append(s.getCars().getRegistrationNumber());
+				}
+				i++;
 			}
-			if (i > 1 && i < slots.length) {
-				sb.append(", ");
-			}
-			i++;
 		}
 		if(sb.toString().isEmpty()){
 			return Messages.NotFound.getValue();
@@ -200,8 +201,10 @@ public class ParkingLot {
 			return "";
 		}
 		for (Slots s : slots) {
-			if (s.getCars().getRegistrationNumber().equals(regisNum)) {
-				return regisNum;
+			if(s!=null && s.getCars()!=null){
+				if (s.getCars().getRegistrationNumber().equals(regisNum)) {
+					return String.valueOf(s.getSlotNumber());
+				}
 			}
 		}
 		return Messages.NotFound.getValue();
@@ -213,13 +216,15 @@ public class ParkingLot {
 		StringBuilder sb = new StringBuilder();
 		int i = 1;
 		for (Slots s : slots) {
-			if (s.getCars().getColor().equals(color)) {
-				sb.append(s.getSlotNumber());
+			if(s!=null && s.getCars()!=null){
+				if (s.getCars().getColor().equals(color)) {
+					if (i > 1 && i < slots.length) {
+						sb.append(", ");
+					}
+					sb.append(s.getSlotNumber());
+				}
+				i++;
 			}
-			if (i > 1 && i < slots.length) {
-				sb.append(", ");
-			}
-			i++;
 		}
 		return sb.toString();
 	}

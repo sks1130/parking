@@ -27,7 +27,7 @@ public class Constants {
 		SlotNumber("Slot No."),
 		Leave("Slot number "),
 		Free(" is free"),
-		RegistrationNumber("Registration No"),
+		RegistrationNumber("Registration No."),
 		Colour("Colour"),
 		CreateParkingLot("Created a parking lot with "),
 		ParkingSlots(" slots");
