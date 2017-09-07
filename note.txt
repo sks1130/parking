@@ -1,0 +1,16 @@
+###notes on the project
+##@author : sachin.srivastava
+##@sourcecode : https://github.com/sks1130/parking.git
+
+1.Its a maven based project so maven should be installed on the system to build and deploy the project.
+	If you are using Linux, check your package manager : 
+		 sudo apt-get install mvn
+	if you are using Homebrew : 
+		brew install maven
+###artifacts used in the target file generation , here jar file
+2.version=1.1
+groupId=com.parking
+artifactId=parking
+
+###maven command to build the project, run the test cases and execute the jar file
+3.mvn clean install exec:java
