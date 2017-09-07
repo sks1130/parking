@@ -25,6 +25,8 @@ public class Constants {
 		NotFound("Not found"),
 		ParkingFull("Sorry, parking lot is full"),
 		SlotNumber("Slot No."),
+		Leave("Slot number "),
+		Free(" is free"),
 		RegistrationNumber("Registration No"),
 		Colour("Colour"),
 		CreateParkingLot("Created a parking lot with "),

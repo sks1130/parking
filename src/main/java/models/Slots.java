@@ -16,8 +16,21 @@ public class Slots {
 		this.slotNumber = slot;
 		this.cars = cars;
 	}
-	
-	public Cars getCar(int slotNumber) {
+
+	public int getSlotNumber() {
+		return slotNumber;
+	}
+
+	public void setSlotNumber(int slotNumber) {
+		this.slotNumber = slotNumber;
+	}
+
+	public Cars getCars() {
 		return cars;
 	}
+
+	public void setCars(Cars cars) {
+		this.cars = cars;
+	}
+	
 }
