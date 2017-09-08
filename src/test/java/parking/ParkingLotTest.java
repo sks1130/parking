@@ -14,8 +14,7 @@ import org.junit.Test;
 public class ParkingLotTest {
 
 	@Test
-	public void parkingWelcome(){
-		//assertTrue(wel.doWelcome().contains("Welcome"));
+	public void parkingLot(){
 	}
 
 }

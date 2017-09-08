@@ -1,10 +1,12 @@
 package parking;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
 import constants.Constants.Messages;
-import constants.Constants.ParkingCommands;
 import models.Cars;
 import models.Slots;
 
@@ -26,19 +28,25 @@ public class ParkingLot {
 	// entry
 
 	public static void main(String[] args) {
-		Scanner scan = new Scanner(System.in);
-		String nextLine = scan.nextLine();
-		accept(nextLine, scan);
-		scan.close();
+		try {
+			Scanner scan = new Scanner(System.in);
+			String nextLine = scan.nextLine();
+			accept(nextLine, scan);
+			scan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	private static void accept(String input, Scanner scan) {
+	private static void accept(String input, Scanner scan) throws Exception {
 		if (input == null || input.isEmpty()) {
+			// when no filename is entered then w'll go by default console input
+			// and output till the loop ends when Input : is blank entered
 			System.out.println("Input:");
 			String commandInput = scan.nextLine();
 			System.out.println();
 			System.out.println("Output:");
-			System.out.println(inputCommand(commandInput));// write the output -TODO
+			System.out.println(inputCommand(commandInput));
 			while (!commandInput.isEmpty()) {
 				System.out.println();
 				System.out.println("Input:");
@@ -51,25 +59,47 @@ public class ParkingLot {
 				}
 				System.out.println();
 				System.out.println("Output:");
-				System.out.println(inputCommand(commandInput));// write the output-- TODO
+				System.out.println(inputCommand(commandInput));
 			}
 
+		} else {
+			// when filename is entered if absolute path is provided then it
+			// will look into the its root src directory else read file from the
+			// absolute path given
+			File file = new File(input);
+			if (file.exists() && !file.isDirectory()) {
+				// read the file and show the output
+				try (BufferedReader br = new BufferedReader(new FileReader(input))) {
+					String commandInput = br.readLine();
+					System.out.println(inputCommand(commandInput));
+					while (commandInput != null) {
+						commandInput = br.readLine();
+						System.out.println(inputCommand(commandInput));
+					}
+				}
+			} else {
+				System.out.println("File not found");
+			}
 		}
 	}
 
 	private static String inputCommand(String commandInput) {
 		if (commandInput == null || commandInput.isEmpty()) {
-			return null;
+			return "";
 		}
-		return executeCommand(commandInput);
+		try {
+			return executeCommand(commandInput);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
-	private static String executeCommand(String commandInput){
+	private static String executeCommand(String commandInput) throws Exception{
 		String[] arr = commandInput.split(" "); //0th element would always be command
 		String output = null;
 		if(arr.length!=0 && arr[0]!=null && !arr[0].isEmpty()){
-			ParkingCommands pc = getCommand(arr[0]);
-			switch (pc.name()) {
+			switch (arr[0]) {
 			case "create_parking_lot":
 				output = createParkingLot(Integer.parseInt(arr[1]));
 				break;
@@ -94,6 +124,7 @@ public class ParkingLot {
 				output = getSlotNumbersForRegistration(arr[1]);
 				break;		
 			default:
+				output = "";
 				break;
 			}
 			return output;
@@ -102,59 +133,69 @@ public class ParkingLot {
 		}
 	}
 
-	public static ParkingCommands getCommand(String command) {
-		for (ParkingCommands pc : ParkingCommands.values()) {
-			if (pc.name().equals(command)) {
-				return pc;
-			}
-		}
-		return null;
-	}
-
 	private static String createParkingLot(int numberOfLot) {
-		if (numberOfLot < 1) {
+		try {
+			if (numberOfLot < 1) {
+				return "";
+			}
+			slots = new Slots[numberOfLot + 1]; // slot starting from 1 to n 0th
+			// would be null
+			slots[0] = null;
+			for (int i = 1; i <= numberOfLot; i++) {
+				slots[i] = new Slots(i, null);
+				slotQueue.add(i);
+			}
+			return  Messages.CreateParkingLot.getValue() + numberOfLot + Messages.ParkingSlots.getValue();
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "";
 		}
-		slots = new Slots[numberOfLot + 1]; // slot starting from 1 to n 0th
-		// would be null
-		slots[0] = null;
-		for (int i = 1; i <= numberOfLot; i++) {
-			slots[i] = new Slots(i, null);
-			slotQueue.add(i);
-		}
-		return Messages.CreateParkingLot.getValue() + numberOfLot + Messages.ParkingSlots.getValue();
 	}
 
 	private static String entryParkingLot(String regNum, String color) {
-		if (regNum == null || regNum.isEmpty() || color == null || color.isEmpty()) {
+		try {
+			if (regNum == null || regNum.isEmpty() || color == null || color.isEmpty()) {
+				return "";
+			}
+			if (isParkingFull()) {
+				return Messages.ParkingFull.getValue();
+			}
+			Cars car = new Cars(regNum, color);
+			size++;
+			int slotNum = getNextSlotNumber();
+			Slots s = new Slots(slotNum, car);
+			slotQueue.poll();// remove the filled slot from queue
+			slots[slotNum] = s;
+			return Messages.Allocated.getValue() + slotNum;
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "";
 		}
-		if (isParkingFull()) {
-			return Messages.ParkingFull.getValue();
-		}
-		Cars car = new Cars(regNum, color);
-		size++;
-		int slotNum = getNextSlotNumber();
-		Slots s = new Slots(slotNum, car);
-		slotQueue.poll();// remove the filled slot from queue
-		slots[slotNum] = s;
-		return Messages.Allocated.getValue() + slotNum;
 	}
 
 	private static String exitParkingLot(int slot) {
-		size--;
-		slotQueue.add(slot);
-		Slots slots = getSlot(slot);
-		slots.setCars(null);
-		return Messages.Leave.getValue() + slot + Messages.Free.getValue();
+		try {
+			size--;
+			slotQueue.add(slot);
+			Slots slots = getSlot(slot);
+			slots.setCars(null);
+			return Messages.Leave.getValue() + slot + Messages.Free.getValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 	private static void showStatus(){
-		System.out.println(Messages.SlotNumber.getValue() + "\t" + Messages.RegistrationNumber.getValue() + "\t" + Messages.Colour.getValue() );
-		for(int i =1 ; i< slots.length ;i++){
-			if(slots[i].getCars()!=null){
-				System.out.print(i + "\t" + slots[i].getCars().getRegistrationNumber() + "\t" + slots[i].getCars().getColor());
-				System.out.println();
+		try {
+			System.out.println(Messages.SlotNumber.getValue() + "\t" + Messages.RegistrationNumber.getValue() + "\t" + Messages.Colour.getValue() );
+			for(int i =1 ; i< slots.length ;i++){
+				if(slots[i].getCars()!=null){
+					System.out.print(i + "\t" + slots[i].getCars().getRegistrationNumber() + "\t" + slots[i].getCars().getColor());
+					System.out.println();
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -166,6 +207,7 @@ public class ParkingLot {
 		return slotQueue.peek();
 	}
 
+	@SuppressWarnings("unused")
 	private static int parkingSize() {
 		return size;
 	}
@@ -175,57 +217,70 @@ public class ParkingLot {
 	}
 
 	private static String getAllRegistrations(String color) {
-		if (color == null || color.isEmpty()) {
+		try {
+			if (color == null || color.isEmpty()) {
+				return "";
+			}
+			StringBuilder sb = new StringBuilder();
+			int i = 1;
+			for (Slots s : slots) {
+				if(s!=null && s.getCars()!=null){
+					if (s.getCars().getColor().equals(color)) {
+						if (i > 1 && i < slots.length) {
+							sb.append(", ");
+						}
+						sb.append(s.getCars().getRegistrationNumber());
+					}
+					i++;
+				}
+			}
+			if(sb.toString().isEmpty()){
+				return Messages.NotFound.getValue();
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "";
 		}
-		StringBuilder sb = new StringBuilder();
-		int i = 1;
-		for (Slots s : slots) {
-			if(s!=null && s.getCars()!=null){
-				if (s.getCars().getColor().equals(color)) {
-					if (i > 1 && i < slots.length) {
-						sb.append(", ");
-					}
-					sb.append(s.getCars().getRegistrationNumber());
-				}
-				i++;
-			}
-		}
-		if(sb.toString().isEmpty()){
-			return Messages.NotFound.getValue();
-		}
-		return sb.toString();
 	}
 	private static String getSlotNumbersForRegistration(String regisNum) {
-		if (regisNum == null || regisNum.isEmpty()) {
-			return "";
-		}
-		for (Slots s : slots) {
-			if(s!=null && s.getCars()!=null){
-				if (s.getCars().getRegistrationNumber().equals(regisNum)) {
+		try {
+			if (regisNum == null || regisNum.isEmpty()) {
+				return "";
+			}
+			for (Slots s : slots) {
+				if (s != null && s.getCars() != null && s.getCars().getRegistrationNumber().equals(regisNum)) {
 					return String.valueOf(s.getSlotNumber());
 				}
 			}
-		}
-		return Messages.NotFound.getValue();
-	}
-	private static String getSlotNumbersForColor(String color) {
-		if (color == null || color.isEmpty()) {
+			return Messages.NotFound.getValue();
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "";
 		}
-		StringBuilder sb = new StringBuilder();
-		int i = 1;
-		for (Slots s : slots) {
-			if(s!=null && s.getCars()!=null){
-				if (s.getCars().getColor().equals(color)) {
-					if (i > 1 && i < slots.length) {
-						sb.append(", ");
-					}
-					sb.append(s.getSlotNumber());
-				}
-				i++;
+	}
+	private static String getSlotNumbersForColor(String color) {
+		try {
+			if (color == null || color.isEmpty()) {
+				return "";
 			}
+			StringBuilder sb = new StringBuilder();
+			int i = 1;
+			for (Slots s : slots) {
+				if(s!=null && s.getCars()!=null){
+					if (s.getCars().getColor().equals(color)) {
+						if (i > 1 && i < slots.length) {
+							sb.append(", ");
+						}
+						sb.append(s.getSlotNumber());
+					}
+					i++;
+				}
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
 		}
-		return sb.toString();
 	}
 }

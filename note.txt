@@ -2,6 +2,7 @@
 ##@author : sachin.srivastava
 ##@sourcecode : https://github.com/sks1130/parking.git
 ##Date : Sep 7-8 2017 
+##to handle this problem key is to manage the entry and exit of the cars in the parking lot , i have used the PriorityQueue to manage that which acts like a minHeap in java
 
 1.Its a maven based project so maven should be installed on the system to build and deploy the project.
 	If you are using Linux, check your package manager : 
@@ -18,3 +19,7 @@ artifactId=parking
 
 ##Java Version
 4. Used java version 1.8 
+
+5. If using  java -jar parking_lot-1.1.jar then it also words fine you can give filename otherwise it will prompt for console inputs
+
+6.sample test file file_inputs.txt is in the root directory.
